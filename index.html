@@ -561,34 +561,15 @@
             </tr>
             <tr>
               <td>
-                <div class="adj-label">開瓶費 - 店有賣</div>
-                <div class="adj-note">NT$3,000/瓶</div>
+                <div class="adj-label">開瓶費</div>
+                <div class="adj-note">店有賣3000、店沒賣500</div>
               </td>
               <td class="td-right">
                 <div class="adj-flex-inputs">
                   <input
                     type="number"
                     class="adj-input"
-                    id="adj-corkage-has"
-                    min="0"
-                    value="0"
-                    oninput="recalc()"
-                  />
-                  <span>瓶</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">開瓶費 - 店沒賣</div>
-                <div class="adj-note">NT$500/瓶</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-corkage-none"
+                    id="adj-corkage"
                     min="0"
                     value="0"
                     oninput="recalc()"
@@ -954,20 +935,12 @@
             note: "部分高檔酒另計",
           },
           {
-            name: "開瓶費 - 店有賣",
-            cost: 3000,
-            price: 3000,
-            qty: 0,
-            isFixed: false,
-            note: "",
-          },
-          {
-            name: "開瓶費 - 店沒賣",
+            name: "開瓶費",
             cost: 500,
             price: 500,
             qty: 0,
             isFixed: false,
-            note: "",
+            note: "店有賣3000、店沒賣500",
           },
           {
             name: "公關-制服/節",
@@ -1023,10 +996,7 @@
           female: parseInt(document.getElementById("adj-female").value) || 0,
           beer: parseInt(document.getElementById("adj-beer").value) || 0,
           spirits: parseInt(document.getElementById("adj-spirits").value) || 0,
-          corkageHas:
-            parseInt(document.getElementById("adj-corkage-has").value) || 0,
-          corkageNone:
-            parseInt(document.getElementById("adj-corkage-none").value) || 0,
+          corkage: parseInt(document.getElementById("adj-corkage").value) || 0,
           pruCount:
             parseInt(document.getElementById("adj-pru-count").value) || 0,
           pruHours:
@@ -1045,12 +1015,11 @@
         store.variable[5].qty = a.female;
         store.variable[6].qty = a.beer;
         store.variable[7].qty = a.spirits;
-        store.variable[8].qty = a.corkageHas;
-        store.variable[9].qty = a.corkageNone;
+        store.variable[8].qty = a.corkage;
 
         // 人數 * 小時 * 6 得到總節數
-        store.variable[10].qty = a.pruCount * a.pruHours * 6;
-        store.variable[11].qty = a.prdCount * a.prdHours * 6;
+        store.variable[9].qty = a.pruCount * a.pruHours * 6;
+        store.variable[10].qty = a.prdCount * a.prdHours * 6;
 
         var total = 0;
         var rows = "";
@@ -1060,10 +1029,10 @@
           total += sub;
 
           var qtyDisplay = item.qty;
-          if (i === 10)
+          if (i === 9)
             qtyDisplay =
               item.qty + "節（" + a.pruCount + "位×" + a.pruHours + "小時）";
-          if (i === 11)
+          if (i === 10)
             qtyDisplay =
               item.qty + "節（" + a.prdCount + "位×" + a.prdHours + "小時）";
 
@@ -1106,8 +1075,7 @@
           "female=" + a.female,
           "beer=" + a.beer,
           "spirits=" + a.spirits,
-          "ckH=" + a.corkageHas,
-          "ckN=" + a.corkageNone,
+          "cork=" + a.corkage,
           "pruC=" + a.pruCount,
           "pruH=" + a.pruHours,
           "prdC=" + a.prdCount,
@@ -1244,11 +1212,8 @@
         document.getElementById("adj-beer").value = urlParams.get("beer");
       if (urlParams.has("spirits"))
         document.getElementById("adj-spirits").value = urlParams.get("spirits");
-      if (urlParams.has("ckH"))
-        document.getElementById("adj-corkage-has").value = urlParams.get("ckH");
-      if (urlParams.has("ckN"))
-        document.getElementById("adj-corkage-none").value =
-          urlParams.get("ckN");
+      if (urlParams.has("cork"))
+        document.getElementById("adj-corkage").value = urlParams.get("cork");
       if (urlParams.has("pruC"))
         document.getElementById("adj-pru-count").value = urlParams.get("pruC");
       if (urlParams.has("pruH"))
