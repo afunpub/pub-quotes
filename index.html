@@ -330,7 +330,13 @@
         margin-top: 2px;
       }
       .adj-input {
-        width: 80px;
+        width: 70px;
+      }
+      .adj-flex-inputs {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
       }
 
       /* Owner metrics */
@@ -459,7 +465,7 @@
         <table class="adj-table">
           <tbody>
             <tr class="section-row">
-              <td colspan="3">人數設定</td>
+              <td colspan="2">人數設定</td>
             </tr>
             <tr>
               <td>
@@ -467,30 +473,34 @@
                 <div class="adj-note">用於計算平均每位費用</div>
               </td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-persons"
-                  min="1"
-                  value="2"
-                  oninput="onPersonsChange()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-persons"
+                    min="1"
+                    value="2"
+                    oninput="onPersonsChange()"
+                  />
+                  <span>人</span>
+                </div>
               </td>
-              <td>人</td>
             </tr>
             <tr>
               <td><div class="adj-label">男客人數</div></td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-male"
-                  min="0"
-                  value="2"
-                  oninput="onGendersChange()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-male"
+                    min="0"
+                    value="2"
+                    oninput="onGendersChange()"
+                  />
+                  <span>人</span>
+                </div>
               </td>
-              <td>人</td>
             </tr>
             <tr>
               <td>
@@ -498,33 +508,37 @@
                 <div class="adj-note">部分店家另收費</div>
               </td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-female"
-                  min="0"
-                  value="0"
-                  oninput="onGendersChange()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-female"
+                    min="0"
+                    value="0"
+                    oninput="onGendersChange()"
+                  />
+                  <span>人</span>
+                </div>
               </td>
-              <td>人</td>
             </tr>
             <tr class="section-row">
-              <td colspan="3">飲品</td>
+              <td colspan="2">飲品</td>
             </tr>
             <tr>
               <td><div class="adj-label">啤酒</div></td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-beer"
-                  min="0"
-                  value="24"
-                  oninput="recalc()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-beer"
+                    min="0"
+                    value="24"
+                    oninput="recalc()"
+                  />
+                  <span>瓶</span>
+                </div>
               </td>
-              <td>瓶</td>
             </tr>
             <tr>
               <td>
@@ -532,19 +546,59 @@
                 <div class="adj-note">高檔酒另計</div>
               </td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-spirits"
-                  min="0"
-                  value="0"
-                  oninput="recalc()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-spirits"
+                    min="0"
+                    value="0"
+                    oninput="recalc()"
+                  />
+                  <span>瓶</span>
+                </div>
               </td>
-              <td>瓶</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">開瓶費 - 店有賣</div>
+                <div class="adj-note">NT$3,000/瓶</div>
+              </td>
+              <td class="td-right">
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-corkage-has"
+                    min="0"
+                    value="0"
+                    oninput="recalc()"
+                  />
+                  <span>瓶</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">開瓶費 - 店沒賣</div>
+                <div class="adj-note">NT$500/瓶</div>
+              </td>
+              <td class="td-right">
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-corkage-none"
+                    min="0"
+                    value="0"
+                    oninput="recalc()"
+                  />
+                  <span>瓶</span>
+                </div>
+              </td>
             </tr>
             <tr class="section-row">
-              <td colspan="3">公關服務</td>
+              <td colspan="2">公關服務</td>
             </tr>
             <tr>
               <td>
@@ -552,17 +606,30 @@
                 <div class="adj-note">NT$1,560/小時（每節260元）</div>
               </td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-pru"
-                  min="0"
-                  step="1"
-                  value="2"
-                  oninput="recalc()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-pru-count"
+                    min="0"
+                    value="2"
+                    placeholder="人數"
+                    oninput="recalc()"
+                  />
+                  <span>位 ×</span>
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-pru-hours"
+                    min="0"
+                    step="0.5"
+                    value="2"
+                    placeholder="小時"
+                    oninput="recalc()"
+                  />
+                  <span>小時</span>
+                </div>
               </td>
-              <td>小時</td>
             </tr>
             <tr>
               <td>
@@ -570,17 +637,30 @@
                 <div class="adj-note">NT$1,860/小時（每節310元）</div>
               </td>
               <td class="td-right">
-                <input
-                  type="number"
-                  class="adj-input"
-                  id="adj-prd"
-                  min="0"
-                  step="1"
-                  value="0"
-                  oninput="recalc()"
-                />
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-prd-count"
+                    min="0"
+                    value="0"
+                    placeholder="人數"
+                    oninput="recalc()"
+                  />
+                  <span>位 ×</span>
+                  <input
+                    type="number"
+                    class="adj-input"
+                    id="adj-prd-hours"
+                    min="0"
+                    step="0.5"
+                    value="0"
+                    placeholder="小時"
+                    oninput="recalc()"
+                  />
+                  <span>小時</span>
+                </div>
               </td>
-              <td>小時</td>
             </tr>
           </tbody>
         </table>
@@ -807,13 +887,12 @@
     <script>
       var pw = "6588";
 
-      // 🟢 將舊的固定費用全部改為具備 cost (成本) 與 price (報價) 結構的項目
       var store = {
         variable: [
           {
             name: "包廂",
             cost: 1000,
-            price: 2000,
+            price: 1500,
             qty: 1,
             isFixed: true,
             note: "",
@@ -875,10 +954,26 @@
             note: "部分高檔酒另計",
           },
           {
+            name: "開瓶費 - 店有賣",
+            cost: 3000,
+            price: 3000,
+            qty: 0,
+            isFixed: false,
+            note: "",
+          },
+          {
+            name: "開瓶費 - 店沒賣",
+            cost: 500,
+            price: 500,
+            qty: 0,
+            isFixed: false,
+            note: "",
+          },
+          {
             name: "公關-制服/節",
             cost: 260,
             price: 260,
-            qty: 12,
+            qty: 24,
             isFixed: false,
             note: "每節260元，以小時計費",
           },
@@ -886,7 +981,7 @@
             name: "公關-禮服/節",
             cost: 310,
             price: 310,
-            qty: 12,
+            qty: 0,
             isFixed: false,
             note: "每節310元，以小時計費",
           },
@@ -928,8 +1023,18 @@
           female: parseInt(document.getElementById("adj-female").value) || 0,
           beer: parseInt(document.getElementById("adj-beer").value) || 0,
           spirits: parseInt(document.getElementById("adj-spirits").value) || 0,
-          pru: parseFloat(document.getElementById("adj-pru").value) || 0,
-          prd: parseFloat(document.getElementById("adj-prd").value) || 0,
+          corkageHas:
+            parseInt(document.getElementById("adj-corkage-has").value) || 0,
+          corkageNone:
+            parseInt(document.getElementById("adj-corkage-none").value) || 0,
+          pruCount:
+            parseInt(document.getElementById("adj-pru-count").value) || 0,
+          pruHours:
+            parseFloat(document.getElementById("adj-pru-hours").value) || 0,
+          prdCount:
+            parseInt(document.getElementById("adj-prd-count").value) || 0,
+          prdHours:
+            parseFloat(document.getElementById("adj-prd-hours").value) || 0,
         };
       }
 
@@ -940,8 +1045,12 @@
         store.variable[5].qty = a.female;
         store.variable[6].qty = a.beer;
         store.variable[7].qty = a.spirits;
-        store.variable[8].qty = a.pru * 6;
-        store.variable[9].qty = a.prd * 6;
+        store.variable[8].qty = a.corkageHas;
+        store.variable[9].qty = a.corkageNone;
+
+        // 人數 * 小時 * 6 得到總節數
+        store.variable[10].qty = a.pruCount * a.pruHours * 6;
+        store.variable[11].qty = a.prdCount * a.prdHours * 6;
 
         var total = 0;
         var rows = "";
@@ -951,8 +1060,12 @@
           total += sub;
 
           var qtyDisplay = item.qty;
-          if (i === 8) qtyDisplay = item.qty + "節（" + a.pru + "小時）";
-          if (i === 9) qtyDisplay = item.qty + "節（" + a.prd + "小時）";
+          if (i === 10)
+            qtyDisplay =
+              item.qty + "節（" + a.pruCount + "位×" + a.pruHours + "小時）";
+          if (i === 11)
+            qtyDisplay =
+              item.qty + "節（" + a.prdCount + "位×" + a.prdHours + "小時）";
 
           rows +=
             "<tr><td>" +
@@ -993,8 +1106,12 @@
           "female=" + a.female,
           "beer=" + a.beer,
           "spirits=" + a.spirits,
-          "pru=" + a.pru,
-          "prd=" + a.prd,
+          "ckH=" + a.corkageHas,
+          "ckN=" + a.corkageNone,
+          "pruC=" + a.pruCount,
+          "pruH=" + a.pruHours,
+          "prdC=" + a.prdCount,
+          "prdH=" + a.prdHours,
         ];
 
         var shareUrl = baseUrl + "?" + params.join("&");
@@ -1127,10 +1244,19 @@
         document.getElementById("adj-beer").value = urlParams.get("beer");
       if (urlParams.has("spirits"))
         document.getElementById("adj-spirits").value = urlParams.get("spirits");
-      if (urlParams.has("pru"))
-        document.getElementById("adj-pru").value = urlParams.get("pru");
-      if (urlParams.has("prd"))
-        document.getElementById("adj-prd").value = urlParams.get("prd");
+      if (urlParams.has("ckH"))
+        document.getElementById("adj-corkage-has").value = urlParams.get("ckH");
+      if (urlParams.has("ckN"))
+        document.getElementById("adj-corkage-none").value =
+          urlParams.get("ckN");
+      if (urlParams.has("pruC"))
+        document.getElementById("adj-pru-count").value = urlParams.get("pruC");
+      if (urlParams.has("pruH"))
+        document.getElementById("adj-pru-hours").value = urlParams.get("pruH");
+      if (urlParams.has("prdC"))
+        document.getElementById("adj-prd-count").value = urlParams.get("prdC");
+      if (urlParams.has("prdH"))
+        document.getElementById("adj-prd-hours").value = urlParams.get("prdH");
 
       recalc();
     </script>
