@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>開桌報價系統</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC",
+          sans-serif;
+        background: #f5f4f0;
+        min-height: 100vh;
+        color: #1a1a1a;
+      }
+      .header {
+        background: #fff;
+        border-bottom: 1px solid #e8e6e0;
+        padding: 0 1.5rem;
+      }
+      .tabs {
+        display: flex;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .tab {
+        padding: 16px 22px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        color: #888;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .tab.active {
+        color: #534ab7;
+        border-bottom-color: #534ab7;
+      }
+      .tab svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+
+      /* Cards */
+      .card {
+        background: #fff;
+        border: 1px solid #e8e6e0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #444;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .card-title svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+      }
+
+      /* Metrics */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 1rem;
+      }
+      .metric {
+        background: #f0effe;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+      }
+      .metric-label {
+        font-size: 12px;
+        color: #7060c0;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      .metric-value {
+        font-size: 26px;
+        font-weight: 600;
+        color: #534ab7;
+      }
+      .metric-sub {
+        font-size: 11px;
+        color: #9080d0;
+        margin-top: 2px;
+      }
+
+      /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        padding: 9px 10px;
+        color: #888;
+        border-bottom: 1px solid #f0eeea;
+        font-weight: 500;
+        font-size: 12px;
+        background: #faf9f7;
+      }
+      td {
+        padding: 9px 10px;
+        border-bottom: 1px solid #f5f3ef;
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #faf9f7;
+      }
+      .td-right {
+        text-align: right;
+      }
+      .td-num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .row-note {
+        font-size: 11px;
+        color: #aaa;
+        margin-top: 2px;
+      }
+      .zero {
+        color: #ccc;
+      }
+
+      /* Inputs */
+      input[type="number"] {
+        width: 100%;
+        padding: 5px 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fafafa;
+        color: #1a1a1a;
+        text-align: right;
+        transition: border 0.15s;
+      }
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #534ab7;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.08);
+      }
+      input[type="text"],
+      input[type="password"] {
+        padding: 9px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fafafa;
+        color: #1a1a1a;
+        width: 100%;
+        transition: border 0.15s;
+      }
+      input[type="text"]:focus,
+      input[type="password"]:focus {
+        outline: none;
+        border-color: #534ab7;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.08);
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        background: #fff;
+        color: #444;
+        transition: all 0.15s;
+      }
+      .btn:hover {
+        background: #f5f4f0;
+        border-color: #bbb;
+      }
+      .btn-primary {
+        background: #534ab7;
+        color: #fff;
+        border-color: #534ab7;
+      }
+      .btn-primary:hover {
+        background: #3c3489;
+        border-color: #3c3489;
+      }
+      .btn-success {
+        background: #0f6e56;
+        color: #fff;
+        border-color: #0f6e56;
+      }
+      .btn-success:hover {
+        background: #0c5643;
+        border-color: #0c5643;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+      }
+
+      /* Client header */
+      .client-banner {
+        background: linear-gradient(135deg, #534ab7, #3c3489);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        color: #fff;
+      }
+      .client-banner h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .client-banner p {
+        font-size: 13px;
+        opacity: 0.75;
+        margin-bottom: 0;
+      }
+
+      /* Lock screen */
+      .lock-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 320px;
+        gap: 14px;
+        text-align: center;
+      }
+      .lock-icon {
+        width: 56px;
+        height: 56px;
+        stroke: #bbb;
+        fill: none;
+        stroke-width: 1.5;
+      }
+      .lock-form {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        max-width: 280px;
+      }
+      .lock-form input {
+        flex: 1;
+      }
+      .err-msg {
+        color: #c0392b;
+        font-size: 12px;
+        min-height: 18px;
+      }
+      .hint {
+        font-size: 12px;
+        color: #aaa;
+      }
+
+      /* Section divider in table */
+      .section-row td {
+        background: #f5f3ef;
+        font-size: 11px;
+        font-weight: 600;
+        color: #888;
+        padding: 6px 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Profit highlight */
+      .profit-pos {
+        color: #0f6e56;
+        font-weight: 500;
+      }
+      .profit-neg {
+        color: #c0392b;
+        font-weight: 500;
+      }
+
+      /* Adjust table */
+      .adj-table td {
+        padding: 10px;
+      }
+      .adj-label {
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .adj-note {
+        font-size: 11px;
+        color: #aaa;
+        margin-top: 2px;
+      }
+      .adj-input {
+        width: 80px;
+      }
+
+      /* Owner metrics */
+      .owner-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+      .owner-metric {
+        background: #f5f3ef;
+        border-radius: 8px;
+        padding: 0.9rem;
+        text-align: center;
+      }
+      .owner-metric-label {
+        font-size: 11px;
+        color: #888;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      .owner-metric-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+      .owner-metric-value.green {
+        color: #0f6e56;
+      }
+      .owner-metric-value.purple {
+        color: #534ab7;
+      }
+
+      @media (max-width: 480px) {
+        .metric-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .owner-metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+        .metric-value {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('client')" id="tab-client">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+            />
+            <rect x="9" y="3" width="6" height="4" rx="1" />
+            <path d="M9 12h6M9 16h4" />
+          </svg>
+          客單（報價）
+        </div>
+        <div class="tab" onclick="switchTab('owner')" id="tab-owner">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+          底單（單價輸入）
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="page-client">
+      <div class="client-banner">
+        <h2>酒店消費開桌報價</h2>
+        <p>調整下方消費項目，即時計算總費用與平均每位費用</p>
+        <p>金額僅供參考，只供評估消費預算，項目單價以店家實際標示為準</p>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">預估總計</div>
+          <div class="metric-value" id="c-total">-</div>
+          <div class="metric-sub">新台幣</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">平均每位</div>
+          <div class="metric-value" id="c-per">-</div>
+          <div class="metric-sub">以消費人數計算</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem">
+        <button
+          class="btn btn-success"
+          onclick="copyShareUrl()"
+          style="
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+          "
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+            ></path>
+            <path
+              d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+            ></path>
+          </svg>
+          【一鍵複製】目前畫面的報價網址傳給客人
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-6" /></svg>
+          調整消費項目
+        </div>
+        <table class="adj-table">
+          <tbody>
+            <tr class="section-row">
+              <td colspan="3">人數設定</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">消費人數</div>
+                <div class="adj-note">用於計算平均每位費用</div>
+              </td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-persons"
+                  min="1"
+                  value="2"
+                  oninput="onPersonsChange()"
+                />
+              </td>
+              <td>人</td>
+            </tr>
+            <tr>
+              <td><div class="adj-label">男客人數</div></td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-male"
+                  min="0"
+                  value="2"
+                  oninput="onGendersChange()"
+                />
+              </td>
+              <td>人</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">女客人數</div>
+                <div class="adj-note">部分店家另收費</div>
+              </td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-female"
+                  min="0"
+                  value="0"
+                  oninput="onGendersChange()"
+                />
+              </td>
+              <td>人</td>
+            </tr>
+            <tr class="section-row">
+              <td colspan="3">飲品</td>
+            </tr>
+            <tr>
+              <td><div class="adj-label">啤酒</div></td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-beer"
+                  min="0"
+                  value="24"
+                  oninput="recalc()"
+                />
+              </td>
+              <td>瓶</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">洋酒／白酒</div>
+                <div class="adj-note">高檔酒另計</div>
+              </td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-spirits"
+                  min="0"
+                  value="0"
+                  oninput="recalc()"
+                />
+              </td>
+              <td>瓶</td>
+            </tr>
+            <tr class="section-row">
+              <td colspan="3">公關服務</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">公關-制服</div>
+                <div class="adj-note">NT$1,560/小時（每節260元）</div>
+              </td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-pru"
+                  min="0"
+                  step="1"
+                  value="2"
+                  oninput="recalc()"
+                />
+              </td>
+              <td>小時</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">公關-禮服</div>
+                <div class="adj-note">NT$1,860/小時（每節310元）</div>
+              </td>
+              <td class="td-right">
+                <input
+                  type="number"
+                  class="adj-input"
+                  id="adj-prd"
+                  min="0"
+                  step="1"
+                  value="0"
+                  oninput="recalc()"
+                />
+              </td>
+              <td>小時</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+            />
+            <rect x="9" y="3" width="6" height="4" rx="1" />
+          </svg>
+          費用明細
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th class="td-right">單價</th>
+              <th class="td-right">數量</th>
+              <th class="td-right">小計</th>
+            </tr>
+          </thead>
+          <tbody id="client-detail"></tbody>
+          <tfoot>
+            <tr>
+              <td
+                colspan="3"
+                style="font-weight: 600; padding: 10px; text-align: right"
+              >
+                總計
+              </td>
+              <td
+                class="td-num"
+                style="font-weight: 700; font-size: 15px; color: #534ab7"
+                id="c-total-foot"
+              >
+                -
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top: 1rem">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"
+            />
+          </svg>
+          聯絡預約
+        </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+          "
+        >
+          <div>
+            <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px">
+              林爸
+            </div>
+            <div style="font-size: 13px; color: #555; margin-bottom: 8px">
+              台北酒店/男模店開桌諮詢
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 6px;
+              "
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#06c755"
+                stroke-width="2"
+              >
+                <path
+                  d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.992 22 12z"
+                />
+              </svg>
+              <span style="font-size: 13px; color: #06c755; font-weight: 500"
+                >LINE ID：jeffreylin2022</span
+              >
+            </div>
+            <div style="font-size: 12px; color: #aaa">
+              掃描右方 QR Code 加 LINE
+            </div>
+          </div>
+          <div style="text-align: center; flex-shrink: 0">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https%3A%2F%2Fline.me%2Fti%2Fp%2F~jeffreylin2022&color=000000&bgcolor=ffffff&margin=2"
+              alt="LINE QR Code"
+              width="120"
+              height="120"
+              style="border-radius: 8px; border: 1px solid #eee; display: block"
+            />
+            <div style="font-size: 11px; color: #aaa; margin-top: 4px">
+              加 LINE 諮詢
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="page-owner" style="display: none">
+      <div id="lock-wrap">
+        <div class="card">
+          <div class="lock-screen">
+            <svg class="lock-icon" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+            <div style="font-size: 17px; font-weight: 600">底單受密碼保護</div>
+            <div style="font-size: 13px; color: #888">
+              輸入密碼以查看或編輯成本資料
+            </div>
+            <div class="lock-form">
+              <input
+                type="password"
+                id="pw-input"
+                placeholder="請輸入密碼"
+                onkeydown="if (event.key === 'Enter') unlock();"
+              />
+              <button class="btn btn-primary" onclick="unlock()">解鎖</button>
+            </div>
+            <div class="err-msg" id="pw-err"></div>
+            <div class="hint">請輸入密碼</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="owner-wrap" style="display: none">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 8px;
+          "
+        >
+          <span style="font-size: 15px; font-weight: 600">底單管理</span>
+          <div style="display: flex; gap: 8px">
+            <button class="btn btn-sm" onclick="changePw()">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
+                />
+              </svg>
+              更改密碼
+            </button>
+            <button class="btn btn-sm" onclick="lock()">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0110 0v4" />
+              </svg>
+              鎖定
+            </button>
+          </div>
+        </div>
+
+        <div class="owner-metrics">
+          <div class="owner-metric">
+            <div class="owner-metric-label">總成本</div>
+            <div class="owner-metric-value" id="o-cost">-</div>
+          </div>
+          <div class="owner-metric">
+            <div class="owner-metric-label">客單總價</div>
+            <div class="owner-metric-value purple" id="o-rev">-</div>
+          </div>
+          <div class="owner-metric">
+            <div class="owner-metric-label">開桌利潤</div>
+            <div class="owner-metric-value green" id="o-profit">-</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 20V10M18 20V4M6 20v-6" />
+            </svg>
+            全項目費用明細（含成本/報價/利潤）
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th class="td-right">成本</th>
+                <th class="td-right">報價</th>
+                <th class="td-right">數量</th>
+                <th class="td-right">利潤</th>
+              </tr>
+            </thead>
+            <tbody id="o-var-body"></tbody>
+          </table>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 1rem;
+          "
+        >
+          <button class="btn btn-primary" onclick="saveAndUpdate()">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
+            儲存並更新客單
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var pw = "6588";
+
+      // 🟢 將舊的固定費用全部改為具備 cost (成本) 與 price (報價) 結構的項目
+      var store = {
+        variable: [
+          {
+            name: "包廂",
+            cost: 1000,
+            price: 2000,
+            qty: 1,
+            isFixed: true,
+            note: "",
+          },
+          {
+            name: "桌面",
+            cost: 300,
+            price: 500,
+            qty: 1,
+            isFixed: true,
+            note: "水、桌面耗材",
+          },
+          {
+            name: "桌面-麥克風套",
+            cost: 100,
+            price: 100,
+            qty: 1,
+            isFixed: true,
+            note: "疫情後新增",
+          },
+          {
+            name: "少爺小費",
+            cost: 1000,
+            price: 1000,
+            qty: 1,
+            isFixed: true,
+            note: "",
+          },
+          {
+            name: "人頭費-男客",
+            cost: 300,
+            price: 500,
+            qty: 2,
+            isFixed: false,
+            note: "",
+          },
+          {
+            name: "人頭費-女客",
+            cost: 500,
+            price: 700,
+            qty: 0,
+            isFixed: false,
+            note: "部分店家女客會多收",
+          },
+          {
+            name: "啤酒/瓶",
+            cost: 50,
+            price: 50,
+            qty: 24,
+            isFixed: false,
+            note: "",
+          },
+          {
+            name: "洋酒白酒",
+            cost: 2000,
+            price: 2000,
+            qty: 0,
+            isFixed: false,
+            note: "部分高檔酒另計",
+          },
+          {
+            name: "公關-制服/節",
+            cost: 260,
+            price: 260,
+            qty: 12,
+            isFixed: false,
+            note: "每節260元，以小時計費",
+          },
+          {
+            name: "公關-禮服/節",
+            cost: 310,
+            price: 310,
+            qty: 12,
+            isFixed: false,
+            note: "每節310元，以小時計費",
+          },
+        ],
+      };
+
+      function fmt(n) {
+        return "NT$" + Math.round(n).toLocaleString();
+      }
+
+      function onGendersChange() {
+        var male = parseInt(document.getElementById("adj-male").value) || 0;
+        var female = parseInt(document.getElementById("adj-female").value) || 0;
+        document.getElementById("adj-persons").value = male + female;
+        recalc();
+      }
+
+      function onPersonsChange() {
+        var persons = Math.max(
+          1,
+          parseInt(document.getElementById("adj-persons").value) || 1,
+        );
+        var male = parseInt(document.getElementById("adj-male").value) || 0;
+        var female = parseInt(document.getElementById("adj-female").value) || 0;
+
+        if (persons > male + female) {
+          document.getElementById("adj-male").value = persons - female;
+        }
+        recalc();
+      }
+
+      function getAdj() {
+        return {
+          persons: Math.max(
+            1,
+            parseInt(document.getElementById("adj-persons").value) || 1,
+          ),
+          male: parseInt(document.getElementById("adj-male").value) || 0,
+          female: parseInt(document.getElementById("adj-female").value) || 0,
+          beer: parseInt(document.getElementById("adj-beer").value) || 0,
+          spirits: parseInt(document.getElementById("adj-spirits").value) || 0,
+          pru: parseFloat(document.getElementById("adj-pru").value) || 0,
+          prd: parseFloat(document.getElementById("adj-prd").value) || 0,
+        };
+      }
+
+      function recalc() {
+        var a = getAdj();
+        // 同步變動項目的數量
+        store.variable[4].qty = a.male;
+        store.variable[5].qty = a.female;
+        store.variable[6].qty = a.beer;
+        store.variable[7].qty = a.spirits;
+        store.variable[8].qty = a.pru * 6;
+        store.variable[9].qty = a.prd * 6;
+
+        var total = 0;
+        var rows = "";
+
+        store.variable.forEach(function (item, i) {
+          var sub = item.price * item.qty;
+          total += sub;
+
+          var qtyDisplay = item.qty;
+          if (i === 8) qtyDisplay = item.qty + "節（" + a.pru + "小時）";
+          if (i === 9) qtyDisplay = item.qty + "節（" + a.prd + "小時）";
+
+          rows +=
+            "<tr><td>" +
+            item.name +
+            (item.note ? '<div class="row-note">' + item.note + "</div>" : "") +
+            "</td>" +
+            '<td class="td-num">' +
+            fmt(item.price) +
+            "</td>" +
+            '<td class="td-num">' +
+            qtyDisplay +
+            "</td>" +
+            '<td class="td-num ' +
+            (sub === 0 ? "zero" : "") +
+            '">' +
+            (sub === 0 ? "—" : fmt(sub)) +
+            "</td></tr>";
+        });
+
+        document.getElementById("client-detail").innerHTML = rows;
+        document.getElementById("c-total").textContent = fmt(total);
+        document.getElementById("c-per").textContent = fmt(total / a.persons);
+        document.getElementById("c-total-foot").textContent = fmt(total);
+        refreshOwnerMetrics();
+      }
+
+      function copyShareUrl() {
+        var baseUrl =
+          window.location.protocol +
+          "//" +
+          window.location.host +
+          window.location.pathname;
+        var a = getAdj();
+
+        var params = [
+          "persons=" + a.persons,
+          "male=" + a.male,
+          "female=" + a.female,
+          "beer=" + a.beer,
+          "spirits=" + a.spirits,
+          "pru=" + a.pru,
+          "prd=" + a.prd,
+        ];
+
+        var shareUrl = baseUrl + "?" + params.join("&");
+
+        navigator.clipboard
+          .writeText(shareUrl)
+          .then(function () {
+            alert("【報價網址已複製成功！】\n可以直接貼在 LINE 傳給客人囉。");
+          })
+          .catch(function (err) {
+            var dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.value = shareUrl;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alert("【報價網址已複製成功！】\n可以直接貼在 LINE 傳給客人囉。");
+          });
+      }
+
+      function refreshOwnerMetrics() {
+        if (document.getElementById("owner-wrap").style.display === "none")
+          return;
+        var cost = 0,
+          rev = 0;
+        store.variable.forEach(function (v) {
+          cost += v.cost * v.qty;
+          rev += v.price * v.qty;
+        });
+        document.getElementById("o-cost").textContent = fmt(cost);
+        document.getElementById("o-rev").textContent = fmt(rev);
+        document.getElementById("o-profit").textContent = fmt(rev - cost);
+      }
+
+      function renderOwner() {
+        var vb = "";
+        store.variable.forEach(function (item, i) {
+          var profit = (item.price - item.cost) * item.qty;
+          var pc = profit > 0 ? "profit-pos" : profit < 0 ? "profit-neg" : "";
+          vb +=
+            "<tr>" +
+            "<td>" +
+            item.name +
+            (item.note ? '<div class="row-note">' + item.note + "</div>" : "") +
+            "</td>" +
+            '<td class="td-right"><input type="number" value="' +
+            item.cost +
+            '" style="width:80px" oninput="store.variable[' +
+            i +
+            '].cost=parseInt(this.value)||0;recalc();renderOwner()"></td>' +
+            '<td class="td-right"><input type="number" value="' +
+            item.price +
+            '" style="width:80px" oninput="store.variable[' +
+            i +
+            '].price=parseInt(this.value)||0;recalc();renderOwner()"></td>' +
+            '<td class="td-num">' +
+            item.qty +
+            "</td>" +
+            '<td class="td-num ' +
+            pc +
+            '">' +
+            fmt(profit) +
+            "</td>" +
+            "</tr>";
+        });
+        document.getElementById("o-var-body").innerHTML = vb;
+        refreshOwnerMetrics();
+      }
+
+      function unlock() {
+        if (document.getElementById("pw-input").value === pw) {
+          document.getElementById("lock-wrap").style.display = "none";
+          document.getElementById("owner-wrap").style.display = "block";
+          document.getElementById("pw-input").value = "";
+          renderOwner();
+        } else {
+          document.getElementById("pw-err").textContent =
+            "密碼錯誤，請再試一次";
+          setTimeout(function () {
+            document.getElementById("pw-err").textContent = "";
+          }, 2500);
+        }
+      }
+
+      function lock() {
+        document.getElementById("lock-wrap").style.display = "block";
+        document.getElementById("owner-wrap").style.display = "none";
+      }
+
+      function changePw() {
+        var np = prompt("請輸入新密碼：");
+        if (np && np.trim()) {
+          pw = np.trim();
+          alert("密碼已更新！");
+        }
+      }
+
+      function saveAndUpdate() {
+        recalc();
+        alert("已儲存！客單已同步更新。");
+      }
+
+      function switchTab(tab) {
+        document
+          .getElementById("tab-client")
+          .classList.toggle("active", tab === "client");
+        document
+          .getElementById("tab-owner")
+          .classList.toggle("active", tab === "owner");
+        document.getElementById("page-client").style.display =
+          tab === "client" ? "block" : "none";
+        document.getElementById("page-owner").style.display =
+          tab === "owner" ? "block" : "none";
+        if (
+          tab === "owner" &&
+          document.getElementById("lock-wrap").style.display === "none"
+        ) {
+          renderOwner();
+        }
+      }
+
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("persons"))
+        document.getElementById("adj-persons").value = urlParams.get("persons");
+      if (urlParams.has("male"))
+        document.getElementById("adj-male").value = urlParams.get("male");
+      if (urlParams.has("female"))
+        document.getElementById("adj-female").value = urlParams.get("female");
+      if (urlParams.has("beer"))
+        document.getElementById("adj-beer").value = urlParams.get("beer");
+      if (urlParams.has("spirits"))
+        document.getElementById("adj-spirits").value = urlParams.get("spirits");
+      if (urlParams.has("pru"))
+        document.getElementById("adj-pru").value = urlParams.get("pru");
+      if (urlParams.has("prd"))
+        document.getElementById("adj-prd").value = urlParams.get("prd");
+
+      recalc();
+    </script>
+  </body>
+</html>
