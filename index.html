@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>開桌報價系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
       * {
         box-sizing: border-box;
@@ -387,7 +388,7 @@
     </style>
   </head>
   <body>
-    <div class="header">
+    <div class="header" id="main-header">
       <div class="tabs">
         <div class="tab active" onclick="switchTab('client')" id="tab-client">
           <svg viewBox="0 0 24 24">
@@ -410,373 +411,420 @@
     </div>
 
     <div class="container" id="page-client">
-      <div class="client-banner">
-        <h2>酒店消費開桌報價</h2>
-        <p>調整下方消費項目，即時計算總費用與平均每位費用</p>
-        <p>金額僅供參考，只供評估消費預算，項目單價以店家實際標示為準</p>
-      </div>
-
-      <div class="metric-grid">
-        <div class="metric">
-          <div class="metric-label">預估總計</div>
-          <div class="metric-value" id="c-total">-</div>
-          <div class="metric-sub">新台幣</div>
+      <div id="screenshot-area" style="background: #f5f4f0; padding: 1px">
+        <div class="client-banner">
+          <h2>酒店消費開桌報價</h2>
+          <p>調整下方消費項目，即時計算總費用與平均每位費用</p>
+          <p>金額僅供參考，項目單價以店家實際標示為準</p>
         </div>
-        <div class="metric">
-          <div class="metric-label">平均每位</div>
-          <div class="metric-value" id="c-per">-</div>
-          <div class="metric-sub">以消費人數計算</div>
-        </div>
-      </div>
 
-      <div style="margin-bottom: 1rem">
-        <button
-          class="btn btn-success"
-          onclick="copyShareUrl()"
-          style="
-            width: 100%;
-            justify-content: center;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 600;
-          "
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
-            ></path>
-            <path
-              d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
-            ></path>
-          </svg>
-          【一鍵複製】目前畫面的報價網址傳給客人
-        </button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-6" /></svg>
-          調整消費項目
-        </div>
-        <table class="adj-table">
-          <tbody>
-            <tr class="section-row">
-              <td colspan="2">硬體與基本設定</td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">包廂費用</div>
-                <div class="adj-note">依現場實際包廂大小計費</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input adj-input-lg"
-                    id="adj-room-price"
-                    min="0"
-                    step="100"
-                    value="1500"
-                    oninput="recalc()"
-                  />
-                  <span>元</span>
-                </div>
-              </td>
-            </tr>
-            <tr class="section-row">
-              <td colspan="2">人數設定</td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">消費人數</div>
-                <div class="adj-note">用於計算平均每位費用</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-persons"
-                    min="1"
-                    value="2"
-                    oninput="onPersonsChange()"
-                  />
-                  <span>人</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td><div class="adj-label">男客人數</div></td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-male"
-                    min="0"
-                    value="2"
-                    oninput="onGendersChange()"
-                  />
-                  <span>人</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">女客人數</div>
-                <div class="adj-note">部分店家另收費</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-female"
-                    min="0"
-                    value="0"
-                    oninput="onGendersChange()"
-                  />
-                  <span>人</span>
-                </div>
-              </td>
-            </tr>
-            <tr class="section-row">
-              <td colspan="2">飲品</td>
-            </tr>
-            <tr>
-              <td><div class="adj-label">啤酒</div></td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-beer"
-                    min="0"
-                    value="24"
-                    oninput="recalc()"
-                  />
-                  <span>瓶</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">洋酒／白酒</div>
-                <div class="adj-note">高檔酒另計</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-spirits"
-                    min="0"
-                    value="0"
-                    oninput="recalc()"
-                  />
-                  <span>瓶</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">開瓶費</div>
-                <div class="adj-note">店有賣3000、店沒賣500</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-corkage"
-                    min="0"
-                    value="0"
-                    oninput="recalc()"
-                  />
-                  <span>瓶</span>
-                </div>
-              </td>
-            </tr>
-            <tr class="section-row">
-              <td colspan="2">公關服務</td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">公關-制服</div>
-                <div class="adj-note">NT$1,560/小時（每節260元）</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-pru-count"
-                    min="0"
-                    value="2"
-                    placeholder="人數"
-                    oninput="recalc()"
-                  />
-                  <span>位 ×</span>
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-pru-hours"
-                    min="0"
-                    step="0.5"
-                    value="2"
-                    placeholder="小時"
-                    oninput="recalc()"
-                  />
-                  <span>小時</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="adj-label">公關-禮服</div>
-                <div class="adj-note">NT$1,860/小時（每節310元）</div>
-              </td>
-              <td class="td-right">
-                <div class="adj-flex-inputs">
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-prd-count"
-                    min="0"
-                    value="0"
-                    placeholder="人數"
-                    oninput="recalc()"
-                  />
-                  <span>位 ×</span>
-                  <input
-                    type="number"
-                    class="adj-input"
-                    id="adj-prd-hours"
-                    min="0"
-                    step="0.5"
-                    value="0"
-                    placeholder="小時"
-                    oninput="recalc()"
-                  />
-                  <span>小時</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
-            />
-            <rect x="9" y="3" width="6" height="4" rx="1" />
-          </svg>
-          費用明細
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>項目</th>
-              <th class="td-right">單價</th>
-              <th class="td-right">數量</th>
-              <th class="td-right">小計</th>
-            </tr>
-          </thead>
-          <tbody id="client-detail"></tbody>
-          <tfoot>
-            <tr>
-              <td
-                colspan="3"
-                style="font-weight: 600; padding: 10px; text-align: right"
-              >
-                總計
-              </td>
-              <td
-                class="td-num"
-                style="font-weight: 700; font-size: 15px; color: #534ab7"
-                id="c-total-foot"
-              >
-                -
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="card" style="margin-top: 1rem">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"
-            />
-          </svg>
-          聯絡預約
-        </div>
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-          "
-        >
-          <div>
-            <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px">
-              林爸
-            </div>
-            <div style="font-size: 13px; color: #555; margin-bottom: 8px">
-              台北酒店/男模店開桌諮詢
-            </div>
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                margin-bottom: 6px;
-              "
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#06c755"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                ></path>
-              </svg>
-              <span style="font-size: 13px; color: #06c755; font-weight: 500"
-                >LINE ID：jeffreylin2022</span
-              >
-            </div>
-            <div style="font-size: 12px; color: #aaa">
-              掃描右方 QR Code 加 LINE
-            </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-label">預估總計</div>
+            <div class="metric-value" id="c-total">-</div>
+            <div class="metric-sub">新台幣</div>
           </div>
-          <div style="text-align: center; flex-shrink: 0">
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https%3A%2F%2Fline.me%2Fti%2Fp%2F~jeffreylin2022&color=000000&bgcolor=ffffff&margin=2"
-              alt="LINE QR Code"
-              width="120"
-              height="120"
-              style="border-radius: 8px; border: 1px solid #eee; display: block"
-            />
-            <div style="font-size: 11px; color: #aaa; margin-top: 4px">
-              加 LINE 諮詢
+          <div class="metric">
+            <div class="metric-label">平均每位</div>
+            <div class="metric-value" id="c-per">-</div>
+            <div class="metric-sub">以消費人數計算</div>
+          </div>
+        </div>
+
+        <div
+          id="action-buttons-group"
+          style="
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          "
+        >
+          <button
+            class="btn btn-success"
+            onclick="copyShareUrl()"
+            style="
+              width: 100%;
+              justify-content: center;
+              padding: 12px;
+              font-size: 14px;
+              font-weight: 600;
+            "
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+              ></path>
+              <path
+                d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+              ></path>
+            </svg>
+            【一鍵複製】目前畫面的報價網址傳給客人
+          </button>
+
+          <button
+            class="btn btn-primary"
+            onclick="takeScreenshot()"
+            style="
+              width: 100%;
+              justify-content: center;
+              padding: 12px;
+              font-size: 14px;
+              font-weight: 600;
+              background-color: #e67e22;
+              border-color: #e67e22;
+            "
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+              ></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            【一鍵截圖】生成純淨版報價單圖片下載
+          </button>
+        </div>
+
+        <div class="card" id="adjust-card-section">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 20V10M18 20V4M6 20v-6" />
+            </svg>
+            調整消費項目
+          </div>
+          <table class="adj-table">
+            <tbody>
+              <tr class="section-row">
+                <td colspan="2">硬體與基本設定</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">包廂費用</div>
+                  <div class="adj-note">依現場實際包廂大小計費</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input adj-input-lg"
+                      id="adj-room-price"
+                      min="0"
+                      step="100"
+                      value="1500"
+                      oninput="recalc()"
+                    />
+                    <span>元</span>
+                  </div>
+                </td>
+              </tr>
+              <tr class="section-row">
+                <td colspan="2">人數設定</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">消費人數</div>
+                  <div class="adj-note">用於計算平均每位費用</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-persons"
+                      min="1"
+                      value="2"
+                      oninput="onPersonsChange()"
+                    />
+                    <span>人</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="adj-label">男客人數</div></td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-male"
+                      min="0"
+                      value="2"
+                      oninput="onGendersChange()"
+                    />
+                    <span>人</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">女客人數</div>
+                  <div class="adj-note">部分店家另收費</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-female"
+                      min="0"
+                      value="0"
+                      oninput="onGendersChange()"
+                    />
+                    <span>人</span>
+                  </div>
+                </td>
+              </tr>
+              <tr class="section-row">
+                <td colspan="2">飲品</td>
+              </tr>
+              <tr>
+                <td><div class="adj-label">啤酒</div></td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-beer"
+                      min="0"
+                      value="24"
+                      oninput="recalc()"
+                    />
+                    <span>瓶</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">洋酒／白酒</div>
+                  <div class="adj-note">高檔酒另計</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-spirits"
+                      min="0"
+                      value="0"
+                      oninput="recalc()"
+                    />
+                    <span>瓶</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">開瓶費</div>
+                  <div class="adj-note">店有賣3000、店沒賣500</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-corkage"
+                      min="0"
+                      value="0"
+                      oninput="recalc()"
+                    />
+                    <span>瓶</span>
+                  </div>
+                </td>
+              </tr>
+              <tr class="section-row">
+                <td colspan="2">公關服務</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">公關-制服</div>
+                  <div class="adj-note">NT$1,560/小時（每節260元）</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-pru-count"
+                      min="0"
+                      value="2"
+                      placeholder="人數"
+                      oninput="recalc()"
+                    />
+                    <span>位 ×</span>
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-pru-hours"
+                      min="0"
+                      step="0.5"
+                      value="2"
+                      placeholder="小時"
+                      oninput="recalc()"
+                    />
+                    <span>小時</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="adj-label">公關-禮服</div>
+                  <div class="adj-note">NT$1,860/小時（每節310元）</div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-prd-count"
+                      min="0"
+                      value="0"
+                      placeholder="人數"
+                      oninput="recalc()"
+                    />
+                    <span>位 ×</span>
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-prd-hours"
+                      min="0"
+                      step="0.5"
+                      value="0"
+                      placeholder="小時"
+                      oninput="recalc()"
+                    />
+                    <span>小時</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+              />
+              <rect x="9" y="3" width="6" height="4" rx="1" />
+            </svg>
+            費用明細
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th class="td-right">單價</th>
+                <th class="td-right">數量</th>
+                <th class="td-right">小計</th>
+              </tr>
+            </thead>
+            <tbody id="client-detail"></tbody>
+            <tfoot>
+              <tr>
+                <td
+                  colspan="3"
+                  style="font-weight: 600; padding: 10px; text-align: right"
+                >
+                  總計
+                </td>
+                <td
+                  class="td-num"
+                  style="font-weight: 700; font-size: 15px; color: #534ab7"
+                  id="c-total-foot"
+                >
+                  -
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top: 1rem">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"
+              />
+            </svg>
+            聯絡預約
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 1.5rem;
+              flex-wrap: wrap;
+            "
+          >
+            <div>
+              <div
+                style="font-size: 16px; font-weight: 600; margin-bottom: 4px"
+              >
+                林爸
+              </div>
+              <div style="font-size: 13px; color: #555; margin-bottom: 8px">
+                台北酒店/男模店開桌諮詢
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  margin-bottom: 6px;
+                "
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#06c755"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  ></path>
+                </svg>
+                <span style="font-size: 13px; color: #06c755; font-weight: 500"
+                  >LINE ID：jeffreylin2022</span
+                >
+              </div>
+              <div style="font-size: 12px; color: #aaa">
+                掃描右方 QR Code 加 LINE
+              </div>
+            </div>
+            <div style="text-align: center; flex-shrink: 0">
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https%3A%2F%2Fline.me%2Fti%2Fp%2F~jeffreylin2022&color=000000&bgcolor=ffffff&margin=2"
+                alt="LINE QR Code"
+                width="120"
+                height="120"
+                style="
+                  border-radius: 8px;
+                  border: 1px solid #eee;
+                  display: block;
+                "
+              />
+              <div style="font-size: 11px; color: #aaa; margin-top: 4px">
+                加 LINE 諮詢
+              </div>
             </div>
           </div>
         </div>
@@ -904,7 +952,7 @@
             price: 1500,
             qty: 1,
             isFixed: true,
-            note: "依實際包廂大小計費",
+            note: "",
           },
           {
             name: "桌面",
@@ -971,17 +1019,17 @@
             note: "店有賣3000、店沒賣500",
           },
           {
-            name: "公關-制服/節",
-            cost: 260,
-            price: 260,
-            qty: 24,
+            name: "公關-制服/小時",
+            cost: 1560,
+            price: 1560,
+            qty: 4,
             isFixed: false,
             note: "每節260元，以小時計費",
           },
           {
-            name: "公關-禮服/節",
-            cost: 310,
-            price: 310,
+            name: "公關-禮服/小時",
+            cost: 1860,
+            price: 1860,
             qty: 0,
             isFixed: false,
             note: "每節310元，以小時計費",
@@ -1040,7 +1088,7 @@
 
       function recalc() {
         var a = getAdj();
-        // 同步變動與包廂項目的金額與數量
+        // 連動包廂價格到資料庫
         store.variable[0].price = a.roomPrice;
         store.variable[4].qty = a.male;
         store.variable[5].qty = a.female;
@@ -1048,9 +1096,8 @@
         store.variable[7].qty = a.spirits;
         store.variable[8].qty = a.corkage;
 
-        // 人數 * 小時 * 6 得到總節數
-        store.variable[9].qty = a.pruCount * a.pruHours * 6;
-        store.variable[10].qty = a.prdCount * a.prdHours * 6;
+        store.variable[9].qty = a.pruCount * a.pruHours;
+        store.variable[10].qty = a.prdCount * a.prdHours;
 
         var total = 0;
         var rows = "";
@@ -1062,10 +1109,20 @@
           var qtyDisplay = item.qty;
           if (i === 9)
             qtyDisplay =
-              item.qty + "節（" + a.pruCount + "位×" + a.pruHours + "小時）";
+              item.qty +
+              " 小時 (" +
+              a.pruCount +
+              "位 × " +
+              a.pruHours +
+              "小時)";
           if (i === 10)
             qtyDisplay =
-              item.qty + "節（" + a.prdCount + "位×" + a.prdHours + "小時）";
+              item.qty +
+              " 小時 (" +
+              a.prdCount +
+              "位 × " +
+              a.prdHours +
+              "小時)";
 
           rows +=
             "<tr><td>" +
@@ -1092,6 +1149,44 @@
         refreshOwnerMetrics();
       }
 
+      // 一鍵截圖功能
+      function takeScreenshot() {
+        var buttons = document.getElementById("action-buttons-group");
+        var adjustCard = document.getElementById("adjust-card-section");
+
+        buttons.style.display = "none";
+        adjustCard.style.display = "none";
+
+        setTimeout(function () {
+          var target = document.getElementById("screenshot-area");
+
+          html2canvas(target, {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: "#f5f4f0",
+          })
+            .then(function (canvas) {
+              buttons.style.display = "flex";
+              adjustCard.style.display = "block";
+
+              var imgData = canvas.toDataURL("image/png");
+              var createEl = document.createElement("a");
+              createEl.href = imgData;
+              createEl.download = "酒店開桌預估報價單.png";
+
+              document.body.appendChild(createEl);
+              createEl.click();
+              document.body.removeChild(createEl);
+            })
+            .catch(function (error) {
+              buttons.style.display = "flex";
+              adjustCard.style.display = "block";
+              alert("截圖失敗，請手動使用手機系統截圖。");
+              console.error(error);
+            });
+        }, 120);
+      }
+
       function copyShareUrl() {
         var baseUrl =
           window.location.protocol +
@@ -1099,7 +1194,6 @@
           window.location.host +
           window.location.pathname;
         var a = getAdj();
-
         var params = [
           "roomP=" + a.roomPrice,
           "persons=" + a.persons,
