@@ -332,6 +332,9 @@
       .adj-input {
         width: 70px;
       }
+      .adj-input-lg {
+        width: 100px;
+      }
       .adj-flex-inputs {
         display: flex;
         align-items: center;
@@ -464,6 +467,29 @@
         </div>
         <table class="adj-table">
           <tbody>
+            <tr class="section-row">
+              <td colspan="2">硬體與基本設定</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="adj-label">包廂費用</div>
+                <div class="adj-note">依現場實際包廂大小計費</div>
+              </td>
+              <td class="td-right">
+                <div class="adj-flex-inputs">
+                  <input
+                    type="number"
+                    class="adj-input adj-input-lg"
+                    id="adj-room-price"
+                    min="0"
+                    step="100"
+                    value="1500"
+                    oninput="recalc()"
+                  />
+                  <span>元</span>
+                </div>
+              </td>
+            </tr>
             <tr class="section-row">
               <td colspan="2">人數設定</td>
             </tr>
@@ -878,7 +904,7 @@
             price: 1500,
             qty: 1,
             isFixed: true,
-            note: "",
+            note: "依實際包廂大小計費",
           },
           {
             name: "桌面",
@@ -990,6 +1016,8 @@
 
       function getAdj() {
         return {
+          roomPrice:
+            parseInt(document.getElementById("adj-room-price").value) || 0,
           persons: Math.max(
             1,
             parseInt(document.getElementById("adj-persons").value) || 1,
@@ -1012,7 +1040,8 @@
 
       function recalc() {
         var a = getAdj();
-        // 同步變動項目的數量
+        // 同步變動與包廂項目的金額與數量
+        store.variable[0].price = a.roomPrice;
         store.variable[4].qty = a.male;
         store.variable[5].qty = a.female;
         store.variable[6].qty = a.beer;
@@ -1072,6 +1101,7 @@
         var a = getAdj();
 
         var params = [
+          "roomP=" + a.roomPrice,
           "persons=" + a.persons,
           "male=" + a.male,
           "female=" + a.female,
@@ -1136,7 +1166,7 @@
             item.price +
             '" style="width:80px" oninput="store.variable[' +
             i +
-            '].price=parseInt(this.value)||0;recalc();renderOwner()"></td>' +
+            "].price=parseInt(this.value)||0; if(i===0){document.getElementById('adj-room-price').value=this.value;} recalc();renderOwner()\"></td>" +
             '<td class="td-num">' +
             item.qty +
             "</td>" +
@@ -1204,6 +1234,9 @@
       }
 
       var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("roomP"))
+        document.getElementById("adj-room-price").value =
+          urlParams.get("roomP");
       if (urlParams.has("persons"))
         document.getElementById("adj-persons").value = urlParams.get("persons");
       if (urlParams.has("male"))
