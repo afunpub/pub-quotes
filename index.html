@@ -112,6 +112,14 @@
         color: #9080d0;
         margin-top: 2px;
       }
+      .metric-approx {
+        font-size: 13px;
+        color: #8a7ad0;
+        font-weight: 500;
+        margin-top: 6px;
+        font-variant-numeric: tabular-nums;
+        min-height: 18px;
+      }
 
       /* Table */
       table {
@@ -423,11 +431,13 @@
             <div class="metric-label">預估總計</div>
             <div class="metric-value" id="c-total">-</div>
             <div class="metric-sub">新台幣</div>
+            <div class="metric-approx" id="c-total-approx"></div>
           </div>
           <div class="metric">
             <div class="metric-label">平均每位</div>
             <div class="metric-value" id="c-per">-</div>
             <div class="metric-sub">以消費人數計算</div>
+            <div class="metric-approx" id="c-per-approx"></div>
           </div>
         </div>
 
@@ -652,7 +662,7 @@
                 <td>
                   <!-- 公關時薪/節薪調整區塊，費用以小時計算 -->
                   <div class="adj-label">公關-制服</div>
-                  <div class="adj-note">NT$1,560/小時（每節260元）</div>
+                  <div class="adj-note" id="note-pru"></div>
                 </td>
                 <td class="td-right">
                   <div class="adj-flex-inputs">
@@ -684,7 +694,7 @@
                 <td>
                   <!-- 公關時薪/節薪調整區塊，費用以小時計算 -->
                   <div class="adj-label">公關-禮服</div>
-                  <div class="adj-note">NT$1,860/小時（每節310元）</div>
+                  <div class="adj-note" id="note-prd"></div>
                 </td>
                 <td class="td-right">
                   <div class="adj-flex-inputs">
@@ -709,6 +719,80 @@
                       oninput="recalc()"
                     />
                     <span>小時</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- 男跨T模，預設 0 位 0 小時，單價說明連動底單 -->
+                  <div class="adj-label">男跨T模</div>
+                  <div class="adj-note" id="note-kt"></div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-kt-count"
+                      min="0"
+                      value="0"
+                      placeholder="人數"
+                      oninput="recalc()"
+                    />
+                    <span>位 ×</span>
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-kt-hours"
+                      min="0"
+                      step="0.5"
+                      value="0"
+                      placeholder="小時"
+                      oninput="recalc()"
+                    />
+                    <span>小時</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- 點檯：節薪 × 節數 × 位，預設 0，說明連動節薪與節數 -->
+                  <div class="adj-label">點檯</div>
+                  <div class="adj-note" id="note-dk"></div>
+                </td>
+                <td class="td-right">
+                  <div class="adj-flex-inputs">
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-dk-rate"
+                      min="0"
+                      step="10"
+                      value="0"
+                      placeholder="節薪"
+                      oninput="recalc()"
+                    />
+                    <span>節薪 ×</span>
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-dk-sessions"
+                      min="0"
+                      value="0"
+                      placeholder="節數"
+                      oninput="recalc()"
+                    />
+                    <span>節 ×</span>
+                    <input
+                      type="number"
+                      class="adj-input"
+                      id="adj-dk-count"
+                      min="0"
+                      value="0"
+                      placeholder="位數"
+                      oninput="recalc()"
+                    />
+                    <span>位</span>
                   </div>
                 </td>
               </tr>
@@ -944,8 +1028,8 @@
     </div>
 
     <script>
-      var pw = "6588";
-
+      var pw = "1234"; // 預設密碼，請自行修改
+      // 預設底單資料，請自行修改
       var store = {
         variable: [
           {
@@ -990,8 +1074,8 @@
           },
           {
             name: "人頭費-女客",
-            cost: 500,
-            price: 700,
+            cost: 300,
+            price: 500,
             qty: 0,
             isFixed: false,
             note: "部分店家女客會多收",
@@ -1020,28 +1104,68 @@
             isFixed: false,
             note: "店有賣3000、店沒賣500",
           },
-          <!-- 公關時薪/節薪調整區塊，費用以小時計算，以下為預設值（2位制服公關，每位2小時） -->
+          // 公關時薪/節薪調整區塊，費用以小時計算，以下為預設值（2位制服公關，每位2小時）
+          // 每節單價不寫死，顯示時一律以 price ÷ 6 即時連動
           {
             name: "公關-制服/小時",
             cost: 1560,
-            price: 1560,
+            price: 1620,
             qty: 4,
             isFixed: false,
-            note: "每節260元，以小時計費",
+            note: "以小時計費",
           },
           {
             name: "公關-禮服/小時",
             cost: 1860,
-            price: 1860,
+            price: 1920,
             qty: 0,
             isFixed: false,
-            note: "每節310元，以小時計費",
+            note: "以小時計費",
+          },
+          {
+            name: "男跨T模/小時",
+            cost: 1560,
+            price: 1620,
+            qty: 0,
+            isFixed: false,
+            note: "以小時計費",
+          },
+          // 點檯：單價由客單輸入的「節薪 × 節數」決定，數量 = 位數；成本於底單自行設定
+          {
+            name: "點檯/位",
+            cost: 0,
+            price: 0,
+            qty: 0,
+            isFixed: false,
+            note: "每節0元x0節",
           },
         ],
       };
 
       function fmt(n) {
         return "NT$" + Math.round(n).toLocaleString();
+      }
+
+      // 計費單位為「小時」的項目：每節單價 = 單價 ÷ 6，不寫死
+      function perSession(n) {
+        return Math.round((Number(n) || 0) / 6);
+      }
+      function isHourly(item) {
+        return String(item.name || "").indexOf("/小時") !== -1;
+      }
+      // 客單調整列說明：NT$xxx/小時（每節xxx元），單價一改就跟著變
+      function hourlyNote(item) {
+        return (
+          fmt(item.price) + "/小時（每節" + perSession(item.price) + "元）"
+        );
+      }
+      // 明細／底單備註：每節多少元依單價 ÷ 6 動態生成
+      function displayNote(item) {
+        var note = item.note || "";
+        if (isHourly(item)) {
+          note = "每節" + perSession(item.price) + "元，" + note;
+        }
+        return note;
       }
 
       function onGendersChange() {
@@ -1086,6 +1210,13 @@
             parseInt(document.getElementById("adj-prd-count").value) || 0,
           prdHours:
             parseFloat(document.getElementById("adj-prd-hours").value) || 0,
+          ktCount: parseInt(document.getElementById("adj-kt-count").value) || 0,
+          ktHours:
+            parseFloat(document.getElementById("adj-kt-hours").value) || 0,
+          dkRate: parseInt(document.getElementById("adj-dk-rate").value) || 0,
+          dkSessions:
+            parseInt(document.getElementById("adj-dk-sessions").value) || 0,
+          dkCount: parseInt(document.getElementById("adj-dk-count").value) || 0,
         };
       }
 
@@ -1101,6 +1232,35 @@
 
         store.variable[9].qty = a.pruCount * a.pruHours;
         store.variable[10].qty = a.prdCount * a.prdHours;
+        store.variable[11].qty = a.ktCount * a.ktHours;
+
+        // 點檯：單價 = 節薪 × 節數（每位），數量 = 位數
+        store.variable[12].price = a.dkRate * a.dkSessions;
+        store.variable[12].qty = a.dkCount;
+        // 明細備註連動節薪與節數，例如「每節260元x3節」
+        store.variable[12].note =
+          "每節" + a.dkRate + "元x" + a.dkSessions + "節";
+
+        // 說明文字連動底單單價（price），每節 = 單價 ÷ 6
+        document.getElementById("note-pru").textContent = hourlyNote(
+          store.variable[9],
+        );
+        document.getElementById("note-prd").textContent = hourlyNote(
+          store.variable[10],
+        );
+        document.getElementById("note-kt").textContent = hourlyNote(
+          store.variable[11],
+        );
+        // 點檯說明：節薪 × 節數 ＝ 每位多少錢，連動輸入即時更新
+        document.getElementById("note-dk").textContent =
+          a.dkRate > 0 && a.dkSessions > 0
+            ? "節薪" +
+              fmt(a.dkRate) +
+              " × " +
+              a.dkSessions +
+              "節 ＝ 每位" +
+              fmt(a.dkRate * a.dkSessions)
+            : "每位費用＝節薪 × 節數";
 
         var total = 0;
         var rows = "";
@@ -1108,6 +1268,8 @@
         store.variable.forEach(function (item, i) {
           var sub = item.price * item.qty;
           total += sub;
+          // 小計 0 元的項目不顯示，畫面更簡潔
+          if (sub === 0) return;
 
           var qtyDisplay = item.qty;
           if (i === 9)
@@ -1126,11 +1288,16 @@
               "位 × " +
               a.prdHours +
               "小時)";
+          if (i === 11)
+            qtyDisplay =
+              item.qty + " 小時 (" + a.ktCount + "位 × " + a.ktHours + "小時)";
+          if (i === 12) qtyDisplay = a.dkCount + " 位";
 
+          var note = displayNote(item);
           rows +=
             "<tr><td>" +
             item.name +
-            (item.note ? '<div class="row-note">' + item.note + "</div>" : "") +
+            (note ? '<div class="row-note">' + note + "</div>" : "") +
             "</td>" +
             '<td class="td-num">' +
             fmt(item.price) +
@@ -1149,6 +1316,14 @@
         document.getElementById("c-total").textContent = fmt(total);
         document.getElementById("c-per").textContent = fmt(total / a.persons);
         document.getElementById("c-total-foot").textContent = fmt(total);
+
+        // 概算：無條件進位到 5,000 的倍數；每位概算 = 概算總額 ÷ 總人數
+        var approx = Math.ceil(total / 5000) * 5000;
+        document.getElementById("c-total-approx").textContent =
+          total > 0 ? "大約 " + fmt(approx) : "";
+        document.getElementById("c-per-approx").textContent =
+          total > 0 ? "大約 " + fmt(approx / a.persons) : "";
+
         refreshOwnerMetrics();
       }
 
@@ -1209,6 +1384,11 @@
           "pruH=" + a.pruHours,
           "prdC=" + a.prdCount,
           "prdH=" + a.prdHours,
+          "ktC=" + a.ktCount,
+          "ktH=" + a.ktHours,
+          "dkR=" + a.dkRate,
+          "dkS=" + a.dkSessions,
+          "dkC=" + a.dkCount,
         ];
 
         var shareUrl = baseUrl + "?" + params.join("&");
@@ -1248,11 +1428,12 @@
         store.variable.forEach(function (item, i) {
           var profit = (item.price - item.cost) * item.qty;
           var pc = profit > 0 ? "profit-pos" : profit < 0 ? "profit-neg" : "";
+          var note = displayNote(item);
           vb +=
             "<tr>" +
             "<td>" +
             item.name +
-            (item.note ? '<div class="row-note">' + item.note + "</div>" : "") +
+            (note ? '<div class="row-note">' + note + "</div>" : "") +
             "</td>" +
             '<td class="td-right"><input type="number" value="' +
             item.cost +
@@ -1263,7 +1444,9 @@
             item.price +
             '" style="width:80px" oninput="store.variable[' +
             i +
-            "].price=parseInt(this.value)||0; if(i===0){document.getElementById('adj-room-price').value=this.value;} recalc();renderOwner()\"></td>" +
+            "].price=parseInt(this.value)||0; if(" +
+            i +
+            "===0){document.getElementById('adj-room-price').value=this.value;} recalc();renderOwner()\"></td>" +
             '<td class="td-num">' +
             item.qty +
             "</td>" +
@@ -1354,6 +1537,16 @@
         document.getElementById("adj-prd-count").value = urlParams.get("prdC");
       if (urlParams.has("prdH"))
         document.getElementById("adj-prd-hours").value = urlParams.get("prdH");
+      if (urlParams.has("ktC"))
+        document.getElementById("adj-kt-count").value = urlParams.get("ktC");
+      if (urlParams.has("ktH"))
+        document.getElementById("adj-kt-hours").value = urlParams.get("ktH");
+      if (urlParams.has("dkR"))
+        document.getElementById("adj-dk-rate").value = urlParams.get("dkR");
+      if (urlParams.has("dkS"))
+        document.getElementById("adj-dk-sessions").value = urlParams.get("dkS");
+      if (urlParams.has("dkC"))
+        document.getElementById("adj-dk-count").value = urlParams.get("dkC");
 
       recalc();
     </script>
